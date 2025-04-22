@@ -178,7 +178,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	float inv[16], det;
 	float mat[16];
 
-	// 转成一维数组方便处理
+	
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)
 			mat[i * 4 + j] = m.m[i][j];
@@ -298,7 +298,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	det = mat[0] * inv[0] + mat[1] * inv[4] + mat[2] * inv[8] + mat[3] * inv[12];
 
 	if (det == 0.0f) {
-		return result; // 返回0矩阵代表不可逆
+		return result; 
 	}
 
 	det = 1.0f / det;
