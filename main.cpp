@@ -11,12 +11,6 @@ const char kWindowTitle[] = "GC2C_03_キョク_キンウ";
 const int kWindowWidth = 1280; // 画面の横幅
 const int kWindowHeight = 720; // 画面の縦幅
 
-//Vector3 Add(const Vector3& v1, const Vector3& v2);
-//Vector3 Sub(const Vector3& v1, const Vector3& v2);
-//Vector3 Mul(float scalar, const Vector3& v);
-//float Dot(const Vector3& v1, const Vector3& v2);
-//float Length(const Vector3& v);
-//Vector3 Normalize(const Vector3& v);
 
 //行列の加法
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -34,12 +28,6 @@ Matrix4x4 MakeIdentity4x4();
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-//void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
-//	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
-//	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
-//	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
-//	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
-//}
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix) {
 	for (int row = 0; row < 4; ++row) {
@@ -63,8 +51,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	/// 初期処理
 
-	/*Vector3 v1{ 1.0f,3.0f,-5.0f };
-	Vector3 v2{ 4.0f,-1.0f,2.0f };*/
+	
 	Matrix4x4 m1 = { 3.2f,0.7f,9.6f,4.4f,
 	    5.5f,1.3f,7.8f,2.1f,
 		6.9f,8.0f,2.6f,1.0f,
@@ -76,7 +63,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		3.3f,9.9f,8.8f,2.2f
 	};
 
-	/*float k = { 4.0f };*/
+	
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -90,21 +77,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		/*Vector3 resultAdd = Add(v1, v2);
-		Vector3 resultSub = Sub(v1, v2);
-		Vector3 resultMul = Mul(k, v1);
-
-		float resultDot = Dot(v1, v2);
-		float resultLength = Length(v1);
-		Vector3 resultNormalize = Normalize(v2);*/
-
+		
+		// 行列の加法（m1 と m2 の各要素を加算）
 		Matrix4x4 resultAdd = Add(m1, m2);
+		// 行列の積（m1 と m2 を掛け算）
 		Matrix4x4 resultMul = Mul(m1, m2);
+		// 行列の減法（m1 から m2 を減算）
 		Matrix4x4 resultSub = Sub(m1, m2);
+		// m1 の逆行列を計算
 		Matrix4x4 inverseM1 = Inverse(m1);
+		// m2 の逆行列を計算
 		Matrix4x4 inverseM2 = Inverse(m2);
+		// m1 の転置行列を計算
 		Matrix4x4 transposeM1 = Transpose(m1);
+		// m2 の転置行列を計算
 		Matrix4x4 transposeM2 = Transpose(m2);
+		// 単位行列を作成
 		Matrix4x4 identity = MakeIdentity4x4();
 
 
@@ -117,13 +105,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
-
-		/*VectorScreenPrintf(0, 0, resultAdd, "Add");	
-		VectorScreenPrintf(0, 20, resultSub, "Sub");
-		VectorScreenPrintf(0, 40, resultMul, "Mul");
-		Novice::ScreenPrintf(0, 60, "Dot: %.02f", resultDot);
-		Novice::ScreenPrintf(0, 80, "Length: %.02f", resultLength);
-		VectorScreenPrintf(0, 100, resultNormalize, "Normalize");*/
 
 		Novice::ScreenPrintf(0, 0, "Add");
 		MatrixScreenPrintf(0, 20, resultAdd);
@@ -161,36 +142,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	return 0;
 }
 
-//Vector3 Add(const Vector3& v1, const Vector3& v2)
-//{
-//	return Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-//	
-//}
-//Vector3 Sub(const Vector3& v1, const Vector3& v2)
-//{
-//	return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-//	
-//}
-//Vector3 Mul(float scalar, const Vector3& v)
-//{
-//	return Vector3(v.x * scalar, v.y * scalar, v.z * scalar);
-//	
-//}
-//float Dot(const Vector3& v1, const Vector3& v2)
-//{
-//	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-//}
-//float Length(const Vector3& v)
-//{
-//	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-//}
-//Vector3 Normalize(const Vector3& v){
-//	Vector3 result;
-//	result.x = v.x / sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-//	result.y = v.y / sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-//	result.z = v.z / sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-//	return result;
-//}
 
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 result{};
@@ -224,24 +175,143 @@ Matrix4x4 Mul(const Matrix4x4& m1, const Matrix4x4& m2) {
 }
 Matrix4x4 Inverse(const Matrix4x4& m) {
 	Matrix4x4 result{};
-	float det = 0.0f;
-	for (int i = 0; i < 4; ++i) {
-		det += (m.m[0][i] * (m.m[1][(i + 1) % 4] * m.m[2][(i + 2) % 4] * m.m[3][(i + 3) % 4] -
-			m.m[1][(i + 2) % 4] * m.m[2][(i + 1) % 4] * m.m[3][(i + 3) % 4]));
-	}
+	float inv[16], det;
+	float mat[16];
+
+	// 转成一维数组方便处理
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			mat[i * 4 + j] = m.m[i][j];
+
+	inv[0] = mat[5] * mat[10] * mat[15] -
+		mat[5] * mat[11] * mat[14] -
+		mat[9] * mat[6] * mat[15] +
+		mat[9] * mat[7] * mat[14] +
+		mat[13] * mat[6] * mat[11] -
+		mat[13] * mat[7] * mat[10];
+
+	inv[4] = -mat[4] * mat[10] * mat[15] +
+		mat[4] * mat[11] * mat[14] +
+		mat[8] * mat[6] * mat[15] -
+		mat[8] * mat[7] * mat[14] -
+		mat[12] * mat[6] * mat[11] +
+		mat[12] * mat[7] * mat[10];
+
+	inv[8] = mat[4] * mat[9] * mat[15] -
+		mat[4] * mat[11] * mat[13] -
+		mat[8] * mat[5] * mat[15] +
+		mat[8] * mat[7] * mat[13] +
+		mat[12] * mat[5] * mat[11] -
+		mat[12] * mat[7] * mat[9];
+
+	inv[12] = -mat[4] * mat[9] * mat[14] +
+		mat[4] * mat[10] * mat[13] +
+		mat[8] * mat[5] * mat[14] -
+		mat[8] * mat[6] * mat[13] -
+		mat[12] * mat[5] * mat[10] +
+		mat[12] * mat[6] * mat[9];
+
+	inv[1] = -mat[1] * mat[10] * mat[15] +
+		mat[1] * mat[11] * mat[14] +
+		mat[9] * mat[2] * mat[15] -
+		mat[9] * mat[3] * mat[14] -
+		mat[13] * mat[2] * mat[11] +
+		mat[13] * mat[3] * mat[10];
+
+	inv[5] = mat[0] * mat[10] * mat[15] -
+		mat[0] * mat[11] * mat[14] -
+		mat[8] * mat[2] * mat[15] +
+		mat[8] * mat[3] * mat[14] +
+		mat[12] * mat[2] * mat[11] -
+		mat[12] * mat[3] * mat[10];
+
+	inv[9] = -mat[0] * mat[9] * mat[15] +
+		mat[0] * mat[11] * mat[13] +
+		mat[8] * mat[1] * mat[15] -
+		mat[8] * mat[3] * mat[13] -
+		mat[12] * mat[1] * mat[11] +
+		mat[12] * mat[3] * mat[9];
+
+	inv[13] = mat[0] * mat[9] * mat[14] -
+		mat[0] * mat[10] * mat[13] -
+		mat[8] * mat[1] * mat[14] +
+		mat[8] * mat[2] * mat[13] +
+		mat[12] * mat[1] * mat[10] -
+		mat[12] * mat[2] * mat[9];
+
+	inv[2] = mat[1] * mat[6] * mat[15] -
+		mat[1] * mat[7] * mat[14] -
+		mat[5] * mat[2] * mat[15] +
+		mat[5] * mat[3] * mat[14] +
+		mat[13] * mat[2] * mat[7] -
+		mat[13] * mat[3] * mat[6];
+
+	inv[6] = -mat[0] * mat[6] * mat[15] +
+		mat[0] * mat[7] * mat[14] +
+		mat[4] * mat[2] * mat[15] -
+		mat[4] * mat[3] * mat[14] -
+		mat[12] * mat[2] * mat[7] +
+		mat[12] * mat[3] * mat[6];
+
+	inv[10] = mat[0] * mat[5] * mat[15] -
+		mat[0] * mat[7] * mat[13] -
+		mat[4] * mat[1] * mat[15] +
+		mat[4] * mat[3] * mat[13] +
+		mat[12] * mat[1] * mat[7] -
+		mat[12] * mat[3] * mat[5];
+
+	inv[14] = -mat[0] * mat[5] * mat[14] +
+		mat[0] * mat[6] * mat[13] +
+		mat[4] * mat[1] * mat[14] -
+		mat[4] * mat[2] * mat[13] -
+		mat[12] * mat[1] * mat[6] +
+		mat[12] * mat[2] * mat[5];
+
+	inv[3] = -mat[1] * mat[6] * mat[11] +
+		mat[1] * mat[7] * mat[10] +
+		mat[5] * mat[2] * mat[11] -
+		mat[5] * mat[3] * mat[10] -
+		mat[9] * mat[2] * mat[7] +
+		mat[9] * mat[3] * mat[6];
+
+	inv[7] = mat[0] * mat[6] * mat[11] -
+		mat[0] * mat[7] * mat[10] -
+		mat[4] * mat[2] * mat[11] +
+		mat[4] * mat[3] * mat[10] +
+		mat[8] * mat[2] * mat[7] -
+		mat[8] * mat[3] * mat[6];
+
+	inv[11] = -mat[0] * mat[5] * mat[11] +
+		mat[0] * mat[7] * mat[9] +
+		mat[4] * mat[1] * mat[11] -
+		mat[4] * mat[3] * mat[9] -
+		mat[8] * mat[1] * mat[7] +
+		mat[8] * mat[3] * mat[5];
+
+	inv[15] = mat[0] * mat[5] * mat[10] -
+		mat[0] * mat[6] * mat[9] -
+		mat[4] * mat[1] * mat[10] +
+		mat[4] * mat[2] * mat[9] +
+		mat[8] * mat[1] * mat[6] -
+		mat[8] * mat[2] * mat[5];
+
+	det = mat[0] * inv[0] + mat[1] * inv[4] + mat[2] * inv[8] + mat[3] * inv[12];
+
 	if (det == 0.0f) {
-		return result;
+		return result; // 返回0矩阵代表不可逆
 	}
-	float invDet = 1.0f / det;
-	for (int row = 0; row < 4; ++row) {
-		for (int column = 0; column < 4; ++column) {
-			result.m[row][column] =
-				(m.m[(row + 1) % 4][(column + 1) % 4] * m.m[(row + 2) % 4][(column + 2) % 4] * m.m[(row + 3) % 4][(column + 3) % 4] -
-					m.m[(row + 1) % 4][(column + 2) % 4] * m.m[(row + 2) % 4][(column + 1) % 4] * m.m[(row + 3) % 4][(column + 3) % 4]) * invDet;
-		}
+
+	det = 1.0f / det;
+
+	for (int i = 0; i < 16; ++i) {
+		((float*)result.m)[i] = inv[i] * det;
 	}
+
 	return result;
 }
+
+
+
 Matrix4x4 Transpose(const Matrix4x4& m) {
 	Matrix4x4 result{};
 	for (int row = 0; row < 4; ++row) {
