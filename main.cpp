@@ -18,7 +18,15 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 //座標変換
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
+static const int kRowHeight = 20;
+static const int kColumnWidth = 60;
 
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
+	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -58,7 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			2.0f,2.0f,1.0f,3.0f
 		};
 
-		Vector3 transformedPoint = Transform(point, transformMatrix);
+		Vector3 transformed = Transform(point, transformMatrix);
 
 		///
 		/// ↑更新処理ここまで
@@ -70,7 +78,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		
+		VectorScreenPrintf(0, 0, transformed, "transformed");
+
 
 		///
 		/// ↑描画処理ここまで
