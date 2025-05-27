@@ -1,6 +1,10 @@
 #include <Novice.h>
+#define _USE_MATH_DEFINES
 #include <Vector3.h>
+#include <Vector2.h>
 #include <cmath>
+#include <math.h>
+#include <assert.h>
 
 const char kWindowTitle[] = "GC2C_03_キョク_キンウ";
 const int kWindowWidth = 1280; // 画面の横幅
@@ -36,36 +40,6 @@ Matrix4x4 MakePerspectiverFovMatrix(float fovY, float aspectRatio, float nearCli
 	return MakePerspectiverFovMatrix;
 }
 
-//正射影行列
-Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
-
-	/*assert(left != right);
-	assert(top != bottom);*/
-	Matrix4x4 MakeOrthographicMatrix;
-	MakeOrthographicMatrix.m[0][0] = 2.0f / (right - left);
-	MakeOrthographicMatrix.m[0][1] = 0.0f;
-	MakeOrthographicMatrix.m[0][2] = 0.0f;
-	MakeOrthographicMatrix.m[0][3] = 0.0f;
-
-	MakeOrthographicMatrix.m[1][0] = 0.0f;
-	MakeOrthographicMatrix.m[1][1] = 2.0f / (top - bottom);
-	MakeOrthographicMatrix.m[1][2] = 0.0f;
-	MakeOrthographicMatrix.m[1][3] = 0.0f;
-
-	MakeOrthographicMatrix.m[2][0] = 0.0f;
-	MakeOrthographicMatrix.m[2][1] = 0.0f;
-	MakeOrthographicMatrix.m[2][2] = 1 / (farClip - nearClip);
-	MakeOrthographicMatrix.m[2][3] = 0.0f;
-
-	MakeOrthographicMatrix.m[3][0] = (left + right) / (left - right);
-	MakeOrthographicMatrix.m[3][1] = (top + bottom) / (bottom - top);
-	MakeOrthographicMatrix.m[3][2] = nearClip / (nearClip - farClip);
-	MakeOrthographicMatrix.m[3][3] = 1.0f;
-
-	return MakeOrthographicMatrix;
-
-}
-
 //ビューポート行列
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 MakeViewportMatrix;
@@ -90,6 +64,199 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	MakeViewportMatrix.m[3][3] = 1.0f;
 	return MakeViewportMatrix;
 }
+
+
+//回転X
+Matrix4x4 MakeRotateXMatrix(float theta = 0) {
+	Matrix4x4 MakeRotateMatrix;
+	MakeRotateMatrix.m[0][0] = 1;
+	MakeRotateMatrix.m[0][1] = 0;
+	MakeRotateMatrix.m[0][2] = 0;
+	MakeRotateMatrix.m[0][3] = 0;
+	MakeRotateMatrix.m[1][0] = 0;
+	MakeRotateMatrix.m[1][1] = std::cos(theta);
+	MakeRotateMatrix.m[1][2] = std::sin(theta);
+	MakeRotateMatrix.m[1][3] = 0;
+	MakeRotateMatrix.m[2][0] = 0;
+	MakeRotateMatrix.m[2][1] = -std::sin(theta);
+	MakeRotateMatrix.m[2][2] = std::cos(theta);
+	MakeRotateMatrix.m[2][3] = 0;
+	MakeRotateMatrix.m[3][0] = 0;
+	MakeRotateMatrix.m[3][1] = 0;
+	MakeRotateMatrix.m[3][2] = 0;
+	MakeRotateMatrix.m[3][3] = 1;
+	return MakeRotateMatrix;
+
+}
+//Y
+Matrix4x4 MakeRotateYMatrix(float theta = 0) {
+	Matrix4x4 MakeRotateMatrix;
+	MakeRotateMatrix.m[0][0] = std::cos(theta);
+	MakeRotateMatrix.m[0][1] = 0;
+	MakeRotateMatrix.m[0][2] = -std::sin(theta);
+	MakeRotateMatrix.m[0][3] = 0;
+	MakeRotateMatrix.m[1][0] = 0;
+	MakeRotateMatrix.m[1][1] = 1;
+	MakeRotateMatrix.m[1][2] = 0;
+	MakeRotateMatrix.m[1][3] = 0;
+	MakeRotateMatrix.m[2][0] = std::sin(theta);;
+	MakeRotateMatrix.m[2][1] = 0;
+	MakeRotateMatrix.m[2][2] = std::cos(theta);
+	MakeRotateMatrix.m[2][3] = 0;
+	MakeRotateMatrix.m[3][0] = 0;
+	MakeRotateMatrix.m[3][1] = 0;
+	MakeRotateMatrix.m[3][2] = 0;
+	MakeRotateMatrix.m[3][3] = 1;
+	return MakeRotateMatrix;
+
+}
+//Z
+Matrix4x4 MakeRotateZMatrix(float theta = 0) {
+	Matrix4x4 MakeRotateMatrix;
+	MakeRotateMatrix.m[0][0] = std::cos(theta);
+	MakeRotateMatrix.m[0][1] = std::sin(theta);
+	MakeRotateMatrix.m[0][2] = 0;
+	MakeRotateMatrix.m[0][3] = 0;
+	MakeRotateMatrix.m[1][0] = -std::sin(theta);
+	MakeRotateMatrix.m[1][1] = std::cos(theta);
+	MakeRotateMatrix.m[1][2] = 0;
+	MakeRotateMatrix.m[1][3] = 0;
+	MakeRotateMatrix.m[2][0] = 0;
+	MakeRotateMatrix.m[2][1] = 0;
+	MakeRotateMatrix.m[2][2] = 1;
+	MakeRotateMatrix.m[2][3] = 0;
+	MakeRotateMatrix.m[3][0] = 0;
+	MakeRotateMatrix.m[3][1] = 0;
+	MakeRotateMatrix.m[3][2] = 0;
+	MakeRotateMatrix.m[3][3] = 1;
+	return MakeRotateMatrix;
+
+}
+
+
+//逆行列
+Matrix4x4 Inverse(const  Matrix4x4& m) {
+	Matrix4x4 Inverse;
+	float A = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
+
+		- m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]
+		- m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1] - m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2]
+
+		+ m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2]
+		+ m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2]
+
+		- m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2]
+		- m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0]
+
+		+ m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0];
+
+	assert(A != 0.0f);
+	float B = 1.0f / A;
+	Inverse.m[0][0] = (m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[1][3] * m.m[2][1] * m.m[3][2] - m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[1][1] * m.m[2][3] * m.m[3][2]) * B;
+	Inverse.m[0][1] = (-m.m[0][1] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[2][3] * m.m[3][1] - m.m[0][3] * m.m[2][1] * m.m[3][2] + m.m[0][3] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[2][1] * m.m[3][3] + m.m[0][1] * m.m[2][3] * m.m[3][2]) * B;
+	Inverse.m[0][2] = (m.m[0][1] * m.m[1][2] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[3][2] - m.m[0][3] * m.m[1][2] * m.m[3][1] - m.m[0][2] * m.m[1][1] * m.m[3][3] - m.m[0][1] * m.m[1][3] * m.m[3][2]) * B;
+	Inverse.m[0][3] = (-m.m[0][1] * m.m[1][2] * m.m[2][3] - m.m[0][2] * m.m[1][3] * m.m[2][1] - m.m[0][3] * m.m[1][1] * m.m[2][2] + m.m[0][3] * m.m[1][2] * m.m[2][1] + m.m[0][2] * m.m[1][1] * m.m[2][3] + m.m[0][1] * m.m[1][3] * m.m[2][2]) * B;
+
+	Inverse.m[1][0] = (-m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[1][3] * m.m[2][0] * m.m[3][2] + m.m[1][3] * m.m[2][2] * m.m[3][0] + m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[1][0] * m.m[2][3] * m.m[3][2]) * B;
+	Inverse.m[1][1] = (m.m[0][0] * m.m[2][2] * m.m[3][3] + m.m[0][2] * m.m[2][3] * m.m[3][0] + m.m[0][3] * m.m[2][0] * m.m[3][2] - m.m[0][2] * m.m[2][2] * m.m[3][0] - m.m[0][2] * m.m[2][0] * m.m[3][3] - m.m[0][0] * m.m[2][3] * m.m[3][2]) * B;
+	Inverse.m[1][2] = (-m.m[0][0] * m.m[1][2] * m.m[3][3] - m.m[0][2] * m.m[1][3] * m.m[3][0] - m.m[0][3] * m.m[1][0] * m.m[3][2] + m.m[0][3] * m.m[1][2] * m.m[3][0] + m.m[0][2] * m.m[1][0] * m.m[3][3] + m.m[0][1] * m.m[1][3] * m.m[3][2]) * B;
+	Inverse.m[1][3] = (m.m[0][0] * m.m[1][2] * m.m[2][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] + m.m[0][3] * m.m[1][0] * m.m[2][2] - m.m[0][3] * m.m[1][2] * m.m[2][0] - m.m[0][2] * m.m[1][0] * m.m[2][3] - m.m[0][0] * m.m[1][3] * m.m[2][2]) * B;
+
+	Inverse.m[2][0] = (m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[1][3] * m.m[2][0] * m.m[3][1] - m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[1][0] * m.m[2][3] * m.m[3][1]) * B;
+	Inverse.m[2][1] = (-m.m[0][0] * m.m[2][1] * m.m[3][3] - m.m[0][1] * m.m[2][3] * m.m[3][0] - m.m[0][3] * m.m[2][0] * m.m[3][1] + m.m[0][3] * m.m[2][1] * m.m[3][0] + m.m[0][1] * m.m[2][0] * m.m[3][3] + m.m[0][0] * m.m[2][3] * m.m[3][1]) * B;
+	Inverse.m[2][2] = (m.m[0][0] * m.m[1][1] * m.m[3][3] + m.m[0][1] * m.m[1][3] * m.m[3][0] + m.m[0][3] * m.m[1][0] * m.m[3][1] - m.m[0][3] * m.m[1][1] * m.m[3][0] - m.m[0][1] * m.m[1][0] * m.m[3][3] - m.m[0][0] * m.m[1][3] * m.m[3][1]) * B;
+	Inverse.m[2][3] = (-m.m[0][3] * m.m[1][1] * m.m[2][0] - m.m[0][1] * m.m[1][3] * m.m[2][0] - m.m[0][3] * m.m[1][0] * m.m[2][1] + m.m[0][3] * m.m[1][1] * m.m[2][0] + m.m[0][1] * m.m[1][0] * m.m[2][3] + m.m[0][0] * m.m[1][3] * m.m[2][1]) * B;
+
+	Inverse.m[3][0] = (-m.m[1][0] * m.m[2][1] * m.m[3][2] - m.m[1][1] * m.m[2][2] * m.m[3][0] - m.m[1][2] * m.m[2][0] * m.m[3][1] + m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[1][1] * m.m[2][0] * m.m[3][2] + m.m[1][0] * m.m[2][2] * m.m[3][1]) * B;
+	Inverse.m[3][1] = (m.m[0][0] * m.m[2][1] * m.m[3][2] + m.m[0][1] * m.m[2][2] * m.m[3][0] + m.m[0][2] * m.m[2][0] * m.m[3][1] - m.m[0][2] * m.m[2][1] * m.m[3][0] - m.m[0][1] * m.m[2][0] * m.m[3][2] - m.m[0][0] * m.m[2][2] * m.m[3][1]) * B;
+	Inverse.m[3][2] = (-m.m[0][0] * m.m[1][1] * m.m[3][2] - m.m[0][1] * m.m[1][2] * m.m[3][0] - m.m[0][2] * m.m[1][0] * m.m[3][1] + m.m[0][2] * m.m[1][1] * m.m[3][0] + m.m[0][1] * m.m[1][0] * m.m[3][2] + m.m[0][0] * m.m[1][2] * m.m[3][1]) * B;
+	Inverse.m[3][3] = (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] + m.m[0][2] * m.m[1][0] * m.m[2][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] - m.m[0][1] * m.m[1][0] * m.m[2][2] - m.m[0][0] * m.m[1][2] * m.m[2][1]) * B;
+
+	return Inverse;
+};
+
+//スカラー倍
+Matrix4x4 Multiply(const Matrix4x4& m1, const  Matrix4x4& m2) {
+	Matrix4x4 multiply;
+	multiply.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] + m1.m[0][3] * m2.m[3][0];
+	multiply.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] + m1.m[0][3] * m2.m[3][1];
+	multiply.m[0][2] = m1.m[0][0] * m2.m[0][2] + m1.m[0][1] * m2.m[1][2] + m1.m[0][2] * m2.m[2][2] + m1.m[0][3] * m2.m[3][2];
+	multiply.m[0][3] = m1.m[0][0] * m2.m[0][3] + m1.m[0][1] * m2.m[1][3] + m1.m[0][2] * m2.m[2][3] + m1.m[0][3] * m2.m[3][3];
+
+	multiply.m[1][0] = m1.m[1][0] * m2.m[0][0] + m1.m[1][1] * m2.m[1][0] + m1.m[1][2] * m2.m[2][0] + m1.m[1][3] * m2.m[3][0];
+	multiply.m[1][1] = m1.m[1][0] * m2.m[0][1] + m1.m[1][1] * m2.m[1][1] + m1.m[1][2] * m2.m[2][1] + m1.m[1][3] * m2.m[3][1];
+	multiply.m[1][2] = m1.m[1][0] * m2.m[0][2] + m1.m[1][1] * m2.m[1][2] + m1.m[1][2] * m2.m[2][2] + m1.m[1][3] * m2.m[3][2];
+	multiply.m[1][3] = m1.m[1][0] * m2.m[0][3] + m1.m[1][1] * m2.m[1][3] + m1.m[1][2] * m2.m[2][3] + m1.m[1][3] * m2.m[3][3];
+
+	multiply.m[2][0] = m1.m[2][0] * m2.m[0][0] + m1.m[2][1] * m2.m[1][0] + m1.m[2][2] * m2.m[2][0] + m1.m[2][3] * m2.m[3][0];
+	multiply.m[2][1] = m1.m[2][0] * m2.m[0][1] + m1.m[2][1] * m2.m[1][1] + m1.m[2][2] * m2.m[2][1] + m1.m[2][3] * m2.m[3][1];
+	multiply.m[2][2] = m1.m[2][0] * m2.m[0][2] + m1.m[2][1] * m2.m[1][2] + m1.m[2][2] * m2.m[2][2] + m1.m[2][3] * m2.m[3][2];
+	multiply.m[2][3] = m1.m[2][0] * m2.m[0][3] + m1.m[2][1] * m2.m[1][3] + m1.m[2][2] * m2.m[2][3] + m1.m[2][3] * m2.m[3][3];
+
+	multiply.m[3][0] = m1.m[3][0] * m2.m[0][0] + m1.m[3][1] * m2.m[1][0] + m1.m[3][2] * m2.m[2][0] + m1.m[3][3] * m2.m[3][0];
+	multiply.m[3][1] = m1.m[3][0] * m2.m[0][1] + m1.m[3][1] * m2.m[1][1] + m1.m[3][2] * m2.m[2][1] + m1.m[3][3] * m2.m[3][1];
+	multiply.m[3][2] = m1.m[3][0] * m2.m[0][2] + m1.m[3][1] * m2.m[1][2] + m1.m[3][2] * m2.m[2][2] + m1.m[3][3] * m2.m[3][2];
+	multiply.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] + m1.m[3][3] * m2.m[3][3];
+
+	return  multiply;
+};
+
+//座標変換
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+	Vector3 result;
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+	return result;
+};
+
+//アフィン変換
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+	//回転
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+
+
+	Matrix4x4 MakeAffineMatrix;
+	MakeAffineMatrix.m[0][0] = scale.x * rotateXYZMatrix.m[0][0];
+	MakeAffineMatrix.m[0][1] = scale.x * rotateXYZMatrix.m[0][1];
+	MakeAffineMatrix.m[0][2] = scale.x * rotateXYZMatrix.m[0][2];
+	MakeAffineMatrix.m[0][3] = 0;
+	MakeAffineMatrix.m[1][0] = scale.y * rotateXYZMatrix.m[1][0];
+	MakeAffineMatrix.m[1][1] = scale.y * rotateXYZMatrix.m[1][1];
+	MakeAffineMatrix.m[1][2] = scale.y * rotateXYZMatrix.m[1][2];
+	MakeAffineMatrix.m[1][3] = 0;
+	MakeAffineMatrix.m[2][0] = scale.z * rotateXYZMatrix.m[2][0];
+	MakeAffineMatrix.m[2][1] = scale.z * rotateXYZMatrix.m[2][1];
+	MakeAffineMatrix.m[2][2] = scale.z * rotateXYZMatrix.m[2][2];
+	MakeAffineMatrix.m[2][3] = 0;
+	MakeAffineMatrix.m[3][0] = translate.x;
+	MakeAffineMatrix.m[3][1] = translate.y;
+	MakeAffineMatrix.m[3][2] = translate.z;
+	MakeAffineMatrix.m[3][3] = 1;
+	return MakeAffineMatrix;
+
+
+}
+
+//クロス積
+Vector3 Cross(const Vector3& v1, const Vector3& v2) {
+	Vector3 Cross;
+	Cross.x = v1.y * v2.z - v1.z * v2.y;
+	Cross.y = v1.z * v2.x - v1.x * v2.z;
+	Cross.z = v1.x * v2.y - v1.y * v2.x;
+
+	return Cross;
+}
+
+
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -117,6 +284,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	/// 初期処理
+	Vector3 v1{ 1.2f,-3.9f,2.5f };
+	Vector3 v2{ 2.8f,0.4f,-1.3f };
+
+
+	Vector3 rotate{ 0,0,0 };
+	Vector3 translate{ 0,0,0 };
+	Vector2 velo = { 0.01f,0.01f };
+	Vector3 cameraPosition{ 0.0f,0.0f,-1.0f };
+	Vector3 kLocaVertices[3]{
+		{0.0f,0.1f,0 },
+		{ 0.1f, 0.0f, 0 },
+		{ -0.1f,0.0f,0 }
+	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -130,13 +310,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		Matrix4x4 orthographicMatrix =
-			MakeOrthographicMatrix(-160.0f, 160.0f, 200.0f, 300.0f, 0.0f, 1000.0f);
-		Matrix4x4 perspectiveFovMatrix =
-			MakePerspectiverFovMatrix(0.63f, 1.33f, 0.1f, 1000.0f);
-		Matrix4x4 viewportMatrix =
-			MakeViewportMatrix(100.0f, 200.0f, 600.0f, 300.0f, 0.0f, 1.0f);
-		
+		Vector3 cross = Cross(v1, v2);
+
+		if (keys[DIK_W]) {
+			translate.z += velo.y;
+		}
+		else if (keys[DIK_S]) {
+			translate.z -= velo.y;
+		}
+
+		if (keys[DIK_A]) {
+			translate.x -= velo.x;
+		}
+		else if (keys[DIK_D]) {
+			translate.x += velo.x;
+		}
+
+
+		if (keys[DIK_RIGHTARROW]) {
+			rotate.y += 3.14f / 180.0f;
+		}
+		else if (keys[DIK_LEFTARROW]) {
+			rotate.y -= 3.14f / 180.0f;
+		}
+
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotate, translate);
+
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, cameraPosition);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+
+		Matrix4x4 projecttionMatrix = MakePerspectiverFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+		//WVPMatrixを作る。同次クリップ空間
+		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projecttionMatrix));
+		//ViewportMatrixを作る
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+		//Screen空間と頂点を変換する
+		Vector3 screenVertices[3];
+		for (uint32_t i = 0; i < 3; ++i) {
+			//正規化デバイス座標系
+			Vector3 ndcVertex = Transform(kLocaVertices[i], worldViewProjectionMatrix);
+			//スクリーン座標系
+			screenVertices[i] = Transform(ndcVertex, viewportMatrix);
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -147,12 +362,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
-		Novice::ScreenPrintf(0, 0, "orthographicMatrix");
-		MatrixScreenPrintf(0, 20, orthographicMatrix, "orthographicMatrix");
-		Novice::ScreenPrintf(0, kRowHeight * 5, "orthographicMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 5 + kRowHeight, perspectiveFovMatrix, "perspectiveFovMatrix");
-		Novice::ScreenPrintf(0, kRowHeight * 10, "orthographicMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 10 + kRowHeight, viewportMatrix, "viewportMatrix");
+		Novice::DrawTriangle(
+			int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y),
+			int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
+		);
 		///
 		/// ↑描画処理ここまで
 		///
