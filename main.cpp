@@ -366,6 +366,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y),
 			int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
 		);
+
+		Novice::ScreenPrintf(20, 20, "Cross: (%.2f, %.2f, %.2f)", cross.x, cross.y, cross.z);
 		///
 		/// ↑描画処理ここまで
 		///
