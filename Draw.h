@@ -40,11 +40,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const uint32_t kSubdivision = 30;
-	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);//経度分割1つ分の角度
-	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);//緯度分割1つ分の角度
+	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);
+	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);
 	//緯度の方向に分割 
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++) {
-		float lat = float(-std::numbers::pi) / 2.0f + kLatEvery * latIndex;//現在の緯度
+		float lat = float(-std::numbers::pi) / 2.0f + kLatEvery * latIndex;
 		//経度の方向に分割
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++) {
 			float lon = lonIndex * kLonEvery;//現在の経度

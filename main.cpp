@@ -78,10 +78,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("Point", &pointSphere.center.x, 0.01f);
 		ImGui::DragFloat3("Segment origin", &segment.origin.x, 0.01f);
-	    ImGui::DragFloat3("Segment Diff", &segment.diff.x, 0.01f);
-	    ImGui::DragFloat3("Project", &point.x, 0.01f);
-		
-		
+		ImGui::DragFloat3("Segment Diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("Project", &point.x, 0.01f);
+
+
 		ImGui::End();
 		///
 		/// ↑描画処理ここまで
@@ -100,4 +100,3 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Novice::Finalize();
 	return 0;
 }
-

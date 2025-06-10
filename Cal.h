@@ -419,12 +419,10 @@ Vector3 Project(const Vector3& v1, const Vector3& v2) {
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	Vector3 result{};
 	float t{};
-
-	// ŒvŽZˆ—
 	t = Dot(Subtract(point, segment.origin), segment.diff) / std::powf(Length(segment.diff), 2.0f);
 	result = Add(segment.origin, F2VMultiply(t, segment.diff));
 
-	//t = Clamp(t, 1.0f, 0.0f);
+
 
 	return result;
 }

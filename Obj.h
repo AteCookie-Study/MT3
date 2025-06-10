@@ -4,18 +4,18 @@
 #include"Matrix4x4.h"
 
 struct Line {
-	Vector3 origin;	//!< 始点
-	Vector3 diff; //!< 終点への差分ベクトル
+	Vector3 origin;	
+	Vector3 diff; 
 };
 
 struct  Ray {
-	Vector3 origin; //!< 始点
-	Vector3 diff; //!< 終点への差分ベクトル
+	Vector3 origin;
+	Vector3 diff; 
 };
 
 struct  Segment {
-	Vector3 origin; //!< 始点
-	Vector3 diff; //!< 終点への差分ベクトル
+	Vector3 origin; 
+	Vector3 diff; 
 };
 
 struct Sphere {
