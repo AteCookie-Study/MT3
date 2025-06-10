@@ -2,6 +2,7 @@
 #include"Obj.h"
 #include"Cal.h"
 #include"Draw.h"
+#include <imgui.h>
 
 const char kWindowTitle[] = "GC2C_03_キョク_キンウ";
 const int kWindowWidth = 1280; // 画面の横幅
@@ -72,7 +73,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(worldMViewProjectionMatrix, viewportMatrix);
 		DrawSphere(pointSphere, worldMViewProjectionMatrix, viewportMatrix, RED);
 		DrawSphere(closestPointSphere, worldMViewProjectionMatrix, viewportMatrix, BLACK);
-
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("Point", &pointSphere.center.x, 0.01f);
+		ImGui::DragFloat3("Segment origin", &segment.origin.x, 0.01f);
+	    ImGui::DragFloat3("Segment Diff", &segment.diff.x, 0.01f);
+	    ImGui::DragFloat3("Project", &point.x, 0.01f);
+		
+		
+		ImGui::End();
 		///
 		/// ↑描画処理ここまで
 		///
