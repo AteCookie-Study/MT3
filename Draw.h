@@ -1,6 +1,6 @@
-﻿#pragma once
+﻿
+#pragma once
 #include"Cal.h"
-
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const float kGridHalfWidht = 2.0f;
 	const int kSoubdibision = 10;
@@ -40,14 +40,14 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
 {
 	const uint32_t kSubdivision = 30;
-	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);
-	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);
+	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);//経度分割1つ分の角度
+	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);//緯度分割1つ分の角度
 	//緯度の方向に分割 
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++) {
-		float lat = float(-std::numbers::pi) / 2.0f + kLatEvery * latIndex;
+		float lat = float(-std::numbers::pi) / 2.0f + kLatEvery * latIndex;//現在の緯度
 		//経度の方向に分割
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++) {
-			float lon = lonIndex * kLonEvery;
+			float lon = lonIndex * kLonEvery;//現在の経度
 			//world座標系でのa,b,cを求める
 			Vector3 a, b, c;
 			a = { sphere.radius * std::cosf(lat) * std::cosf(lon), sphere.radius * std::sinf(lat), sphere.radius * std::cosf(lat) * std::sinf(lon) };
@@ -78,8 +78,29 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 				int(c.x), int(c.y),
 				color
 			);
-
 		}
 	}
+};
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 center = F2VMultiply(plane.distance, plane.normal);
+	Vector3 perpendiculars[4];
+	perpendiculars[0] = Normalize(Prependicular(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z };
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z };
+
+	Vector3 points[4];
+	for (uint32_t index = 0; index < 4; ++index) {
+		Vector3 extend = F2VMultiply(2.0f, perpendiculars[index]);
+		Vector3 point = Add(center, extend);
+		points[index] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[3].x), int(points[3].y), color);
+	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[1].x), int(points[1].y), color);
+	Novice::DrawLine(int(points[1].x), int(points[1].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[0].x), int(points[0].y), color);
 
 };

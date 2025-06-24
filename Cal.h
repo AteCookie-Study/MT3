@@ -443,3 +443,56 @@ bool InCollision(const Sphere& s1, const Sphere& s2) {
 
 	return result;
 }
+
+bool InCollision(const Sphere& s, const Plane& p) {
+	bool result;
+
+	float k{};
+
+	k = Dot(p.normal, s.center) - p.distance;
+
+	k = std::abs(k);
+
+	if (k < s.radius)
+	{
+		result = true;
+	}
+	else
+	{
+		result = false;
+	}
+
+	return result;
+}
+
+Vector3 Prependicular(const Vector3& vector) {
+
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return { -vector.y, vector.x, 0.0f };
+	}
+	return { 0.0f, -vector.z, vector.y };
+};
+
+Vector3 Normalize(const Vector3& v) {
+
+	float length = Length(v);
+	Vector3 result;
+	if (!length == 0)
+	{
+		result.x = v.x / length;
+		result.y = v.y / length;
+		result.z = v.z / length;
+	}
+
+	return result;
+
+};
+Vector3 Cross(const Vector3& v1, const Vector3& v2) {
+	Vector3 result;
+
+	result = { v1.y * v2.z - v1.z * v2.y,
+		v1.z * v2.x - v1.x * v2.z,
+		v1.x * v2.y - v1.y * v2.x };
+
+	return result;
+}

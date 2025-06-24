@@ -22,3 +22,8 @@ struct Sphere {
 	Vector3 center;
 	float radius;
 };
+
+struct Plane {
+	Vector3 normal; 
+	float distance; 
+};
