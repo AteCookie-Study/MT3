@@ -47,7 +47,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 		float lat = float(-std::numbers::pi) / 2.0f + kLatEvery * latIndex;
 		//経度の方向に分割
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++) {
-			float lon = lonIndex * kLonEvery;//現在の経度
+			float lon = lonIndex * kLonEvery;
 			//world座標系でのa,b,cを求める
 			Vector3 a, b, c;
 			a = { sphere.radius * std::cosf(lat) * std::cosf(lon), sphere.radius * std::sinf(lat), sphere.radius * std::cosf(lat) * std::sinf(lon) };
