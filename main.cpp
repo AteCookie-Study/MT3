@@ -1,5 +1,4 @@
 #include <Novice.h>
-#include"Obj.h"
 #include"Cal.h"
 #include"Draw.h"
 #include <imgui.h>
@@ -30,9 +29,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate = { 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate = { 0.26f,0.0f,0.0f };
 
-	Sphere sphere1 = { 0.0f,0.0f, 0.0f, 1.0f };
+	Segment line = { {0,0,0},{1,1,0} };
 
-	Plane plane = { 1.0f,1.0f,1.0f,1.0f };
+	Plane plane = { 1.0f,1.0f,1.0f,{1.0f} };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -45,14 +44,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		///
 		/// ↓更新処理ここから
-		///
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, cameraRotate, cameraTranslate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-		Matrix4x4 worldMViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
-		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
-
+		Matrix4x4 worldMViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 viewportMatrix = MakeViewPortMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 		///
 		/// ↑更新処理ここまで
 		///
@@ -63,19 +60,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		DrawGrid(worldMViewProjectionMatrix, viewportMatrix);
-		if (InCollision(sphere1, plane))
+		if (IsCollision(line, plane))
 		{
-			DrawSphere(sphere1, worldMViewProjectionMatrix, viewportMatrix, RED);
+			DrawLine(line, worldMViewProjectionMatrix, viewportMatrix, RED);
 		}
 		else
 		{
-			DrawSphere(sphere1, worldMViewProjectionMatrix, viewportMatrix, BLACK);
+			DrawLine(line, worldMViewProjectionMatrix, viewportMatrix, BLACK);
 		}
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("Sphere1Center", &sphere1.center.x, 0.01f);
-		ImGui::DragFloat("Sphere1Radius", &sphere1.radius, 0.01f);
+		ImGui::DragFloat3("Sphere1Center", &line.origin.x, 0.01f);
 		ImGui::End();
 
 		DrawPlane(plane, worldMViewProjectionMatrix, viewportMatrix, BLACK);
