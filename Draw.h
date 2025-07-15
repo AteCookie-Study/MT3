@@ -141,3 +141,20 @@ void DrawLine(const Segment& segment, const Matrix4x4& viewProjectionMatrix, con
 		int(screenLine[1].x), int(screenLine[1].y),
 		color);
 }
+
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix4x4, uint32_t color) {
+
+	Vector3 screenVertices[3];
+	Vector3 ndcVertex;
+
+	//ƒXƒNƒŠ[ƒ“‚Ö•ÏŠ·
+	for (uint32_t i = 0; i < 3; ++i) {
+		ndcVertex = TransformCoord(triangle.vertices[i], viewProjectionMatrix);
+		screenVertices[i] = TransformCoord(ndcVertex, viewportMatrix4x4);
+
+	}
+	Novice::DrawTriangle(int(screenVertices[0].x), int(screenVertices[0].y),
+		int(screenVertices[1].x), int(screenVertices[1].y),
+		int(screenVertices[2].x), int(screenVertices[2].y),
+		color, kFillModeWireFrame);
+}
