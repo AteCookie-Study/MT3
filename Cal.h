@@ -5,6 +5,8 @@
 #include"cmath"
 #include<numbers>
 #include<assert.h>
+#include<algorithm>
+
 
 float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
@@ -51,25 +53,6 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 		}
 	}
 
-	/*result.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] + m1.m[0][3] * m2.m[3][0];
-	result.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] + m1.m[0][3] * m2.m[3][1];
-	result.m[0][2] = m1.m[0][0] * m2.m[0][2] + m1.m[0][1] * m2.m[1][2] + m1.m[0][2] * m2.m[2][2] + m1.m[0][3] * m2.m[3][2];
-	result.m[0][3] = m1.m[0][0] * m2.m[0][3] + m1.m[0][1] * m2.m[1][3] + m1.m[0][2] * m2.m[2][3] + m1.m[0][3] * m2.m[3][3];
-
-	result.m[1][0] = m1.m[1][0] * m2.m[0][0] + m1.m[1][1] * m2.m[1][0] + m1.m[1][2] * m2.m[2][0] + m1.m[1][3] * m2.m[3][0];
-	result.m[1][1] = m1.m[1][0] * m2.m[0][1] + m1.m[1][1] * m2.m[1][1] + m1.m[1][2] * m2.m[2][1] + m1.m[1][3] * m2.m[3][1];
-	result.m[1][2] = m1.m[1][0] * m2.m[0][2] + m1.m[1][1] * m2.m[1][2] + m1.m[1][2] * m2.m[2][2] + m1.m[1][3] * m2.m[3][2];
-	result.m[1][3] = m1.m[1][0] * m2.m[0][3] + m1.m[1][1] * m2.m[1][3] + m1.m[1][2] * m2.m[2][3] + m1.m[1][3] * m2.m[3][3];
-
-	result.m[2][0] = m1.m[2][0] * m2.m[0][0] + m1.m[2][1] * m2.m[1][0] + m1.m[2][2] * m2.m[2][0] + m1.m[2][3] * m2.m[3][0];
-	result.m[2][1] = m1.m[2][0] * m2.m[0][1] + m1.m[2][1] * m2.m[1][1] + m1.m[2][2] * m2.m[2][1] + m1.m[2][3] * m2.m[3][1];
-	result.m[2][2] = m1.m[2][0] * m2.m[0][2] + m1.m[2][1] * m2.m[1][2] + m1.m[2][2] * m2.m[2][2] + m1.m[2][3] * m2.m[3][2];
-	result.m[2][3] = m1.m[2][0] * m2.m[0][3] + m1.m[2][1] * m2.m[1][3] + m1.m[2][2] * m2.m[2][3] + m1.m[2][3] * m2.m[3][3];
-
-	result.m[3][0] = m1.m[3][0] * m2.m[0][0] + m1.m[3][1] * m2.m[1][0] + m1.m[3][2] * m2.m[2][0] + m1.m[3][3] * m2.m[3][0];
-	result.m[3][1] = m1.m[3][0] * m2.m[0][1] + m1.m[3][1] * m2.m[1][1] + m1.m[3][2] * m2.m[2][1] + m1.m[3][3] * m2.m[3][1];
-	result.m[3][2] = m1.m[3][0] * m2.m[0][2] + m1.m[3][1] * m2.m[1][2] + m1.m[3][2] * m2.m[2][2] + m1.m[3][3] * m2.m[3][2];
-	result.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] + m1.m[3][3] * m2.m[3][3];*/
 	return result;
 };
 float Length(const Vector3& v) {
@@ -97,9 +80,6 @@ Matrix4x4 MakeTranslateMatrix(const Vector3 translate) {
 		}
 	}
 
-	/*for (int i = 0; i < 4; i++) {
-		result.m[i][i] = 1;
-	}*/
 
 	result.m[0][0] = 1;
 	result.m[1][1] = 1;
@@ -170,15 +150,11 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 Matrix4x4 MakeAffineMatrix(const Vector3 scale, const Vector3 rotate, const Vector3 translate) {
 	Matrix4x4 result{};
 
-	/*Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
-
-	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);*/
 	Matrix4x4 rotateXYZMatrix = Multiply(
 		MakeRotateXMatrix(rotate.x),
 		Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
 
-	/*result2 = Multiply(rotateXYZMatrix, translateMatrix);
-	result = Multiply(rotateXYZMatrix, scaleMatrix);*/
+
 	result.m[0][0] = rotateXYZMatrix.m[0][0] * scale.x;
 	result.m[0][1] = rotateXYZMatrix.m[0][1] * scale.x;
 	result.m[0][2] = rotateXYZMatrix.m[0][2] * scale.x;
@@ -471,17 +447,6 @@ Matrix4x4 Transpose(const Matrix4x4& m) {
 		}
 	}
 
-	//result.m[0][0] = m.m[0][0];
-	//result.m[0][1] = m.m[1][0];
-	//result.m[0][2] = m.m[2][0];
-	//result.m[0][3] = m.m[3][0];
-
-	//result.m[1][0] = m.m[0][1];
-	//result.m[1][1] = m.m[1][1];
-	//result.m[1][2] = m.m[2][1];
-	//result.m[1][3] = m.m[3][1];
-
-
 	return result;
 };
 Matrix4x4 MakeIdentity4x4() {
@@ -636,6 +601,20 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2) {
 		(aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) &&
 		(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z))
 	{
+		return true;
+	}
+	return false;
+};
+
+bool IsCollision(const AABB& aabb, const Sphere& sphere) {
+
+	Vector3 closestPoint{ std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
+	std::clamp(sphere.center.y,aabb.min.y,aabb.max.y),
+	std::clamp(sphere.center.z,aabb.min.z,aabb.max.z) };
+
+	float distance = Length(Subtract(closestPoint, sphere.center));
+
+	if (distance <= sphere.radius) {
 		return true;
 	}
 	return false;

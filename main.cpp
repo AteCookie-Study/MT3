@@ -29,14 +29,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate = { 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate = { 0.26f,0.0f,0.0f };
 
+	Sphere sphere{
+		{0,0,0.5f},
+		0.5f
+	};
+
 	AABB aabb1{
 		{-0.5f,-0.5f,-0.5f},
 		{0.0f, 0.0f, 0.0f},
 	};
-	AABB aabb2{
-		{0.2f, 0.2f, 0.2f},
-		{1.0f, 1.0f, 1.0f},
-	};
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -55,7 +57,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 worldMViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewPortMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-
 		/// ↑更新処理ここまで
 		///
 
@@ -71,18 +72,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("AABB1", &aabb1.max.x, 0.01f);
 		ImGui::DragFloat3("AABB1", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("AABB2", &aabb2.max.x, 0.01f);
-		ImGui::DragFloat3("AABB2", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("Sphere", &sphere.center.x, 0.01f);
 		ImGui::End();
 
-		if (IsCollision(aabb1, aabb2)) {
+		if (IsCollision(aabb1, sphere)) {
 			DrawAABB(aabb1, worldMViewProjectionMatrix, viewportMatrix, RED);
 		}
 		else
 		{
 			DrawAABB(aabb1, worldMViewProjectionMatrix, viewportMatrix, WHITE);
 		}
-		DrawAABB(aabb2, worldMViewProjectionMatrix, viewportMatrix, WHITE);
+
+		DrawShere(sphere, worldMViewProjectionMatrix, viewportMatrix, WHITE);
+
 
 		///
 		/// ↑描画処理ここまで
