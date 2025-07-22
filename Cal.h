@@ -669,3 +669,41 @@ inline Vector3 Transform(const Vector3& vector, const Matrix4x4 matrix) {
 
 	return result;
 }
+
+Vector3 CatmullRomSpline(float t, const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3) {
+	Vector3 result;
+	result.x = 0.5f * ((-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t * t * t +
+		(2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t * t + (-p0.x + p2.x) * t + 2 * p1.x);
+	result.y = 0.5f * ((-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t * t * t +
+		(2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t * t + (-p0.y + p2.y) * t + 2 * p1.y);
+	result.z = 0.5f * ((-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * t * t * t +
+		(2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * t * t + (-p0.z + p2.z) * t + 2 * p1.z);
+	return result;
+}
+void DrawCatmullRom(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, const Vector3& controlPoint3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+	const int division = 100;
+	Vector3 prevPoint = CatmullRomSpline(0, controlPoint0, controlPoint0, controlPoint1, controlPoint2);
+	prevPoint = Transform(Transform(prevPoint, viewProjectionMatrix), viewPortMatrix);
+
+	for (int i = 1; i <= division; ++i) {
+		float t = static_cast<float>(i) / division;
+		Vector3 point;
+
+		if (t < 1.0f / 3.0f) {
+			t *= 3; // normalize t to [0,1]
+			point = CatmullRomSpline(t, controlPoint0, controlPoint0, controlPoint1, controlPoint2);
+		}
+		else if (t < 2.0f / 3.0f) {
+			t = (t - 1.0f / 3.0f) * 3; // normalize t to [0,1]
+			point = CatmullRomSpline(t, controlPoint0, controlPoint1, controlPoint2, controlPoint3);
+		}
+		else {
+			t = (t - 2.0f / 3.0f) * 3; // normalize t to [0,1]
+			point = CatmullRomSpline(t, controlPoint1, controlPoint2, controlPoint3, controlPoint3);
+		}
+
+		point = Transform(Transform(point, viewProjectionMatrix), viewPortMatrix);
+		Novice::DrawLine(int(prevPoint.x), int(prevPoint.y), int(point.x), int(point.y), color);
+		prevPoint = point;
+	}
+}

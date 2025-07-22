@@ -218,3 +218,41 @@ void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, 
 
 	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
 }
+
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
+	const uint32_t kSubdivision = 20; // 分割数
+	const float kLonEvery = 2.0f * std::numbers::pi_v<float> / float(kSubdivision); // 経度分割1つ分の角度
+	const float kLatEvery = std::numbers::pi_v<float> / float(kSubdivision); // 緯度分割1つ分の角度
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, sphere.rotate, sphere.center);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+
+	// 緯度の方向に分割 -π/2 ~ π/2
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++) {
+		float lat = -std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;//現在の緯度
+		// 経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++) {
+			float lon = kLonEvery * lonIndex; // 現在の経度
+
+			// world座標系でのa,b,cを求める
+			Vector3 a, b, c;
+			a = { std::cosf(lat) * std::cosf(lon) * sphere.radius,sinf(lat) * sphere.radius, std::cosf(lat) * std::sinf(lon) * sphere.radius };
+			b = { std::cosf(lat + kLatEvery) * std::cosf(lon) * sphere.radius,std::sinf(lat + kLatEvery) * sphere.radius,std::cosf(lat + kLatEvery) * std::sinf(lon) * sphere.radius };
+			c = { std::cos(lat) * std::cos(lon + kLonEvery) * sphere.radius,std::sin(lat) * sphere.radius,std::cos(lat) * std::sin(lon + kLonEvery) * sphere.radius };
+			// a, b, c を screen 座標系に変換
+
+			Vector3 ndcA = Transform(a, worldViewProjectionMatrix);
+			Vector3 screenA = Transform(ndcA, viewportMatrix);
+
+			Vector3 ndcB = Transform(b, worldViewProjectionMatrix);
+			Vector3 screenB = Transform(ndcB, viewportMatrix);
+
+			Vector3 ndcC = Transform(c, worldViewProjectionMatrix);
+			Vector3 screenC = Transform(ndcC, viewportMatrix);
+
+			// ab, bc で線を引く
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y), BLACK);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), BLACK);
+		}
+	}
+
+}

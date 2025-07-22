@@ -25,6 +25,7 @@ struct  Segment {
 
 struct Sphere {
 	Vector3 center;
+	Vector3 rotate;
 	float radius;
 };
 
