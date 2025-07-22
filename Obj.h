@@ -31,3 +31,8 @@ struct Sphere {
 struct Triangle {
 	Vector3 vertices[3];
 };
+
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};

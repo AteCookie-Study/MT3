@@ -147,7 +147,7 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 	Vector3 screenVertices[3];
 	Vector3 ndcVertex;
 
-	//ƒXƒNƒŠ[ƒ“‚Ö•ÏŠ·
+	//スクリーンへ変換
 	for (uint32_t i = 0; i < 3; ++i) {
 		ndcVertex = TransformCoord(triangle.vertices[i], viewProjectionMatrix);
 		screenVertices[i] = TransformCoord(ndcVertex, viewportMatrix4x4);
@@ -157,4 +157,57 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		int(screenVertices[1].x), int(screenVertices[1].y),
 		int(screenVertices[2].x), int(screenVertices[2].y),
 		color, kFillModeWireFrame);
+}
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+
+	Vector3 aabbVertices[8]{};
+	Vector3 aabbWorldVertices[8]{};
+	Vector3 aabbScreenVertices[8]{};
+
+	// 左下手前
+	aabbVertices[0] = aabb.min;
+	// 右下手前
+	aabbVertices[1] = { aabb.max.x, aabb.min.y, aabb.min.z };
+	// 右下奥
+	aabbVertices[2] = { aabb.max.x, aabb.min.y, aabb.max.z };
+	// 左下奥
+	aabbVertices[3] = { aabb.min.x, aabb.min.y, aabb.max.z };
+
+	// 左上手前
+	aabbVertices[4] = { aabb.min.x, aabb.max.y , aabb.min.z };
+	// 右上手前
+	aabbVertices[5] = { aabb.max.x, aabb.max.y , aabb.min.z };
+	// 右上奥
+	aabbVertices[6] = { aabb.max.x, aabb.max.y, aabb.max.z };
+	// 左上奥
+	aabbVertices[7] = { aabb.min.x, aabb.max.y, aabb.max.z };
+
+	// スクリーン座標系に変換
+	for (int i = 0; i < 8; i++) {
+		// スクリーン座標系に変換
+		aabbWorldVertices[i] = TransformCoord(aabbVertices[i], viewProjectionMatrix);
+		aabbScreenVertices[i] = TransformCoord(aabbWorldVertices[i], viewPortMatrix);
+	}
+
+	/// 線を引く
+
+	// 四角形下
+	Novice::DrawLine((int)aabbScreenVertices[0].x, (int)aabbScreenVertices[0].y, (int)aabbScreenVertices[1].x, (int)aabbScreenVertices[1].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[1].x, (int)aabbScreenVertices[1].y, (int)aabbScreenVertices[2].x, (int)aabbScreenVertices[2].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[2].x, (int)aabbScreenVertices[2].y, (int)aabbScreenVertices[3].x, (int)aabbScreenVertices[3].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[3].x, (int)aabbScreenVertices[3].y, (int)aabbScreenVertices[0].x, (int)aabbScreenVertices[0].y, color);
+
+	// 四角形上
+	Novice::DrawLine((int)aabbScreenVertices[4].x, (int)aabbScreenVertices[4].y, (int)aabbScreenVertices[5].x, (int)aabbScreenVertices[5].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[5].x, (int)aabbScreenVertices[5].y, (int)aabbScreenVertices[6].x, (int)aabbScreenVertices[6].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[6].x, (int)aabbScreenVertices[6].y, (int)aabbScreenVertices[7].x, (int)aabbScreenVertices[7].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[7].x, (int)aabbScreenVertices[7].y, (int)aabbScreenVertices[4].x, (int)aabbScreenVertices[4].y, color);
+
+	// 四角形辺
+	Novice::DrawLine((int)aabbScreenVertices[0].x, (int)aabbScreenVertices[0].y, (int)aabbScreenVertices[4].x, (int)aabbScreenVertices[4].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[1].x, (int)aabbScreenVertices[1].y, (int)aabbScreenVertices[5].x, (int)aabbScreenVertices[5].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[2].x, (int)aabbScreenVertices[2].y, (int)aabbScreenVertices[6].x, (int)aabbScreenVertices[6].y, color);
+	Novice::DrawLine((int)aabbScreenVertices[3].x, (int)aabbScreenVertices[3].y, (int)aabbScreenVertices[7].x, (int)aabbScreenVertices[7].y, color);
+
 }
