@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include"Matrix4x4.h"
+#include"Vector2.h"
 #include"Vector3.h"
 #include"Obj.h"
 #include"cmath"
@@ -7,6 +8,9 @@
 #include<assert.h>
 #include<algorithm>
 
+struct Matrix3x3 {
+	float m[3][3];
+};
 
 float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
@@ -215,7 +219,8 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 
 	return result;
 };
-static Matrix4x4 MakeViewPortMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
+
+static Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 result{};
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -232,6 +237,7 @@ static Matrix4x4 MakeViewPortMatrix(float left, float top, float width, float he
 
 	return result;
 };
+
 Matrix4x4 Inverse(const Matrix4x4& m) {
 	float a =
 		m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]
@@ -618,4 +624,48 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere) {
 		return true;
 	}
 	return false;
+}
+
+bool IsCollision(const AABB& aabb, const Segment& segment) {
+	float tXMin = (aabb.min.x - segment.origin.x) / segment.diff.x;
+	float tYMin = (aabb.min.y - segment.origin.y) / segment.diff.y;
+	float tZMin = (aabb.min.z - segment.origin.z) / segment.diff.z;
+	float tXMax = (aabb.max.x - segment.origin.x) / segment.diff.x;
+	float tYMax = (aabb.max.y - segment.origin.y) / segment.diff.y;
+	float tZMax = (aabb.max.z - segment.origin.z) / segment.diff.z;
+
+	float tNearX = min(tXMin, tXMax);
+	float tNearY = min(tYMin, tYMax);
+	float tNearZ = min(tZMin, tZMax);
+	float tFarX = max(tXMin, tXMax);
+	float tFarY = max(tYMin, tYMax);
+	float tFarZ = max(tZMin, tZMax);
+
+	//AABBとの衝突店（貫通店）のtが小さいほう
+	float tMin = max(max(tNearX, tNearY), tNearZ);
+	//AABBとの衝突店（貫通店）のtが小さいほう
+	float tMax = min(min(tFarX, tFarY), tFarZ);
+
+	if (tMin <= tMax) {
+		return true;
+	}
+
+	return false;
+}
+
+inline Vector3 Transform(const Vector3& vector, const Matrix4x4 matrix) {
+	Vector3 result = {};
+
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+
+	assert(w != 0);
+
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+
+	return result;
 }

@@ -3,6 +3,7 @@
 #include"Draw.h"
 #include <imgui.h>
 
+
 const char kWindowTitle[] = "GC2C_03_キョク_キンウ";
 const int kWindowWidth = 1280; // 画面の横幅
 const int kWindowHeight = 720; // 画面の縦幅
@@ -11,7 +12,14 @@ const int kWindowHeight = 720; // 画面の縦幅
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
+Matrix4x4 MakeViewProjectionMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector3 cameraScale, Vector3 cameraRotate, Vector3 cameraTranslate) {
+	Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraScale, cameraRotate, cameraTranslate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+	return (Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix)));
 
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -24,20 +32,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	/// 初期処理
+	AABB aabb = { {-0.5f, -0.5f, -0.5f}, {0.5f ,0.5f, 0.5f} };
+	Segment segment{ {0.7f, 0.3f, 0.0f}, {2.0f, -0.5f, 0.0f} };
+	uint32_t color = WHITE;
+
 	Vector3 rotate = {};
 	Vector3 translate = {};
-	Vector3 cameraTranslate = { 0.0f,1.9f,-6.49f };
-	Vector3 cameraRotate = { 0.26f,0.0f,0.0f };
+	Vector3 cameraRotate = { 0.0f, 0.0f, 0.0f };
+	Vector3 cameraTranslate = { 0.0f, 0.0f, -9.49f };
+	Vector3 cameraPosition = { 0,0,-5.0f };
 
-	Sphere sphere{
-		{0,0,0.5f},
-		0.5f
-	};
+	Vector3 start{};
+	Vector3 end{};
 
-	AABB aabb1{
-		{-0.5f,-0.5f,-0.5f},
-		{0.0f, 0.0f, 0.0f},
-	};
+	Matrix4x4 viewProjectionMatrix = {};
+	Matrix4x4 viewportMatrix = {};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -50,13 +59,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		///
 		/// ↓更新処理ここから
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotate, translate);
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, cameraRotate, cameraTranslate);
-		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-		Matrix4x4 worldMViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 viewportMatrix = MakeViewPortMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+		viewProjectionMatrix = MakeViewProjectionMatrix({ 1, 1, 1 }, rotate, translate, { 1, 1, 1 }, cameraRotate, cameraTranslate);
+		viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
+		if (IsCollision(aabb, segment)) {
+			color = RED;
+		}
+		else {
+			color = WHITE;
+		}
+
+
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("aabb.min", &aabb.min.x, 0.01f);
+		ImGui::DragFloat3("aabb.max", &aabb.max.x, 0.01f);
+		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
+
+		aabb.min.x = (std::min)(aabb.min.x, aabb.max.x);
+		aabb.max.x = (std::max)(aabb.min.x, aabb.max.x);
+		aabb.min.y = (std::min)(aabb.min.y, aabb.max.y);
+		aabb.max.y = (std::max)(aabb.min.y, aabb.max.y);
+		aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
+		aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 		/// ↑更新処理ここまで
 		///
 
@@ -65,26 +91,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
-		DrawGrid(worldMViewProjectionMatrix, viewportMatrix);
 
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("AABB1", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("AABB1", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("Sphere", &sphere.center.x, 0.01f);
-		ImGui::End();
-
-		if (IsCollision(aabb1, sphere)) {
-			DrawAABB(aabb1, worldMViewProjectionMatrix, viewportMatrix, RED);
-		}
-		else
-		{
-			DrawAABB(aabb1, worldMViewProjectionMatrix, viewportMatrix, WHITE);
-		}
-
-		DrawShere(sphere, worldMViewProjectionMatrix, viewportMatrix, WHITE);
-
+		DrawSegment(segment, viewProjectionMatrix, viewportMatrix, color);
+		DrawAABB(aabb, viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
 		///
 		/// ↑描画処理ここまで
