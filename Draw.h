@@ -256,3 +256,43 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 
 }
+
+void DrawSphereWorldMatrix(const Matrix4x4& worldMatrix, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+{
+	const uint32_t kSubdivision = 20; // 分割数
+	const float kRadius = 0.05f;
+	const float kLonEvery = 2.0f * std::numbers::pi_v<float> / float(kSubdivision); // 経度分割1つ分の角度
+	const float kLatEvery = std::numbers::pi_v<float> / float(kSubdivision); // 緯度分割1つ分の角度
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+
+	// 緯度の方向に分割 -π/2 ~ π/2
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; latIndex++)
+	{
+		float lat = -std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex;//現在の緯度
+		// 経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; lonIndex++)
+		{
+			float lon = kLonEvery * lonIndex; // 現在の経度
+
+			// world座標系でのa,b,cを求める
+			Vector3 a, b, c;
+			a = { std::cosf(lat) * std::cosf(lon) * kRadius,sinf(lat) * kRadius, std::cosf(lat) * std::sinf(lon) * kRadius };
+			b = { std::cosf(lat + kLatEvery) * std::cosf(lon) * kRadius,std::sinf(lat + kLatEvery) * kRadius,std::cosf(lat + kLatEvery) * std::sinf(lon) * kRadius };
+			c = { std::cos(lat) * std::cos(lon + kLonEvery) * kRadius,std::sin(lat) * kRadius,std::cos(lat) * std::sin(lon + kLonEvery) * kRadius };
+			// a, b, c を screen 座標系に変換
+
+			Vector3 ndcA = Transform(a, worldViewProjectionMatrix);
+			Vector3 screenA = Transform(ndcA, viewportMatrix);
+
+			Vector3 ndcB = Transform(b, worldViewProjectionMatrix);
+			Vector3 screenB = Transform(ndcB, viewportMatrix);
+
+			Vector3 ndcC = Transform(c, worldViewProjectionMatrix);
+			Vector3 screenC = Transform(ndcC, viewportMatrix);
+
+			// ab, bc で線を引く
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y), color);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
+		}
+	}
+}
